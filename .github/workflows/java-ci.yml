@@ -1,18 +1,17 @@
-name: Java CI - Attendance API
+name: Java CI - Simple Project
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
+    - name: Checkout code
       uses: actions/checkout@v3
 
     - name: Set up JDK 17
@@ -21,11 +20,18 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
 
-    - name: Compile Java Code
+    - name: Download JUnit Console Launcher
+      run: |
+        curl -L -o junit.jar \
+        https://repo1.maven.org/maven2/org/junit/platform/junit-platform-console-standalone/1.10.1/junit-platform-console-standalone-1.10.1.jar
+
+    - name: Compile Java code
       run: |
         mkdir -p out
-        javac -d out $(find . -name "*.java")
+        javac -cp junit.jar -d out $(find src -name "*.java")
 
-    - name: Run JUnit Tests
+    - name: Run Tests
       run: |
-        java -jar junit-platform-console-standalone.jar --class-path out --scan-class-path
+        java -jar junit.jar \
+        --class-path out \
+        --scan-class-path
